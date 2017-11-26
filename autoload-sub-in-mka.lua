@@ -54,17 +54,21 @@ function alnumcomp(x, y)
 end
 ------------------------------------------------------------------ END
 
-function get_filename(path, sub_auto)
-    if sub_auto == "exact" then
-        match = string.match(path, "^(.+)%.")
+function match_filename(path, sub_auto, filename_wo_ext)
+    match = string.match(path, "^(.+)%.")
+    if match == filename_wo_ext then
+        return true
+    elseif sub_auto == "exact" then
+        return false
     else -- fuzzy. When sub_auto=all, return identical value to fuzzy
-        match = string.match(path, "^([^%.]+)%.")
+        while match ~= nil do
+            match = string.match(match, "^(.+)%.")
+            if match == filename_wo_ext then
+                return true
+            end
+        end
     end
-    if match == nil then
-        return "nomatch"
-    else
-        return match
-    end
+    return false
 end
 
 function autoload_sub_in_mka()
@@ -94,11 +98,12 @@ function autoload_sub_in_mka()
     local audio_auto = mp.get_property("options/audio-file-auto", "")
 
     -- in current dir
+    -- Lua needs to escape ( ) . % + - * ? [ ] ^ $
     table.filter(files, function (v, k)
         if string.match(v, "^%.") then
             return false
         end
-        if sub_auto ~= "all" and get_filename(v, sub_auto) ~= filename_wo_ext then
+        if sub_auto ~= "all" and not match_filename(v, sub_auto, filename_wo_ext) then
             return false
         end
         local ext = get_extension(v)
@@ -117,7 +122,7 @@ function autoload_sub_in_mka()
 
     if audio_auto ~= "no" then
         table.filter(files, function (v, k)
-            if audio_auto ~= "all" and get_filename(v, audio_auto) ~= filename_wo_ext then
+            if audio_auto ~= "all" and not match_filename(v, audio_auto, filename_wo_ext) then
                 return false
             else
                 return true
@@ -142,7 +147,7 @@ function autoload_sub_in_mka()
             if string.match(v, "^%.") then
                 return false
             end
-            if sub_auto ~= "all" and get_filename(v, sub_auto) ~= filename_wo_ext then
+            if sub_auto ~= "all" and not match_filename(v, sub_auto, filename_wo_ext) then
                 return false
             end
             local ext = get_extension(v)
@@ -174,7 +179,7 @@ function autoload_sub_in_mka()
             -- no sub_auto ~= "all" here because even if sub-auto=all,
             -- one should not expect all mka files in audio-file-paths to be
             -- loaded as subtitle files
-            if get_filename(v, sub_auto) ~= filename_wo_ext then
+            if not match_filename(v, sub_auto, filename_wo_ext) then
                 return false
             end
             local ext = get_extension(v)
@@ -193,7 +198,7 @@ function autoload_sub_in_mka()
 
         if audio_auto ~= "no" then
             table.filter(files, function (v, k)
-                if audio_auto ~= "all" and get_filename(v, audio_auto) ~= filename_wo_ext then
+                if audio_auto ~= "all" and not match_filename(v, audio_auto, filename_wo_ext) then
                     return false
                 else
                     return true
