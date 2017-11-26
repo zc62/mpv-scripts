@@ -1,8 +1,9 @@
 -- Load mka files as sub files.
 -- Respect sub-auto, audio-auto, sub-file-paths and audio-file-paths options.
--- This script may cause inconsistent track selection between different runs,
--- because it depends on when the mpv-player main program loads mkv/mka files.
--- Better to make this a built-in feature.
+-- This script may cause inconsistent track selections between different runs,
+-- because the track order depends on when the mpv-player main program loads
+-- mkv/mka files. Better to make this a built-in feature in mpv.
+-- Issue 5132
 
 mputils = require 'mp.utils'
 
