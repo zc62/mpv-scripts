@@ -118,17 +118,11 @@ function autoload_sub_in_mka()
     end
 
     table.filter(files, function (v, k)
-        if string.match(v, "^%.") then
-            return false
-        end
         if audio_auto ~= "all" and get_filename(v, audio_auto) ~= filename_wo_ext then
             return false
+        else
+            return true
         end
-        local ext = get_extension(v)
-        if string.lower(ext) ~= "mka" then
-            return false
-        end
-        return true
     end)
     table.sort(files, alnumcomp)
 
@@ -198,17 +192,11 @@ function autoload_sub_in_mka()
         end
 
         table.filter(files, function (v, k)
-            if string.match(v, "^%.") then
-                return false
-            end
             if audio_auto ~= "all" and get_filename(v, audio_auto) ~= filename_wo_ext then
                 return false
+            else
+                return true
             end
-            local ext = get_extension(v)
-            if string.lower(ext) ~= "mka" then
-                return false
-            end
-            return true
         end)
         table.sort(files, alnumcomp)
 
