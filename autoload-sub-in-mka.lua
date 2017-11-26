@@ -88,12 +88,9 @@ function autoload_sub_in_mka()
     local audio_file_paths = mp.get_property_native("options/audio-file-paths", {})
     local sub_file_paths = mp.get_property_native("options/sub-file-paths", {})
 
-    local sub_files = mp.get_property_native("sub-files", {})
-
     -- for unknown reasons, these mka files won't be loaded as audio files
     -- add them back manually
     local audio_auto = mp.get_property("options/audio-file-auto", "")
-    local audio_files = mp.get_property_native("audio-files", {})
 
     -- in current dir
     table.filter(files, function (v, k)
@@ -113,7 +110,7 @@ function autoload_sub_in_mka()
 
     for i = 1, #files do
         local file = mputils.join_path(dir, files[i])
-        table.insert(sub_files, file)
+        mp.commandv("sub-add", file, "auto")
         mp.msg.info("Adding as subtitle files: " .. file)
     end
 
@@ -128,7 +125,7 @@ function autoload_sub_in_mka()
 
     for i = 1, #files do
         local file = mputils.join_path(dir, files[i])
-        table.insert(audio_files, file)
+        mp.commandv("audio-add", file, "cached")
     end
 
     -- in sub-file-paths
@@ -155,7 +152,7 @@ function autoload_sub_in_mka()
 
         for j = 1, #files do
             local file = mputils.join_path(sub_file_path, files[j])
-            table.insert(sub_files, file)
+            mp.commandv("sub-add", file, "auto")
             mp.msg.info("Adding as subtitle files: " .. file)
         end
     end
@@ -187,7 +184,7 @@ function autoload_sub_in_mka()
 
         for j = 1, #files do
             local file = mputils.join_path(audio_file_path, files[j])
-            table.insert(sub_files, file)
+            mp.commandv("sub-add", file, "auto")
             mp.msg.info("Adding as subtitle files: " .. file)
         end
 
@@ -202,12 +199,9 @@ function autoload_sub_in_mka()
 
         for i = 1, #files do
             local file = mputils.join_path(dir, files[i])
-            table.insert(audio_files, file)
+            mp.commandv("audio-add", file, "cached")
         end
     end
-
-    mp.set_property_native("sub-files", sub_files)
-    mp.set_property_native("audio-files", audio_files)
 end
 
 mp.register_event("start-file", autoload_sub_in_mka)
