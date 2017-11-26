@@ -90,6 +90,11 @@ function autoload_sub_in_mka()
 
     local sub_files = mp.get_property_native("sub-files", {})
 
+    -- for unknown reasons, these mka files won't be loaded as audio files
+    -- add them back manually
+    local audio_auto = mp.get_property("options/audio-file-auto", "")
+    local audio_files = mp.get_property_native("audio-files", {})
+
     -- in current dir
     table.filter(files, function (v, k)
         if string.match(v, "^%.") then
@@ -110,6 +115,26 @@ function autoload_sub_in_mka()
         local file = mputils.join_path(dir, files[i])
         table.insert(sub_files, file)
         mp.msg.info("Adding as subtitle files: " .. file)
+    end
+
+    table.filter(files, function (v, k)
+        if string.match(v, "^%.") then
+            return false
+        end
+        if audio_auto ~= "all" and get_filename(v, audio_auto) ~= filename_wo_ext then
+            return false
+        end
+        local ext = get_extension(v)
+        if string.lower(ext) ~= "mka" then
+            return false
+        end
+        return true
+    end)
+    table.sort(files, alnumcomp)
+
+    for i = 1, #files do
+        local file = mputils.join_path(dir, files[i])
+        table.insert(audio_files, file)
     end
 
     -- in sub-file-paths
@@ -171,9 +196,30 @@ function autoload_sub_in_mka()
             table.insert(sub_files, file)
             mp.msg.info("Adding as subtitle files: " .. file)
         end
+
+        table.filter(files, function (v, k)
+            if string.match(v, "^%.") then
+                return false
+            end
+            if audio_auto ~= "all" and get_filename(v, audio_auto) ~= filename_wo_ext then
+                return false
+            end
+            local ext = get_extension(v)
+            if string.lower(ext) ~= "mka" then
+                return false
+            end
+            return true
+        end)
+        table.sort(files, alnumcomp)
+
+        for i = 1, #files do
+            local file = mputils.join_path(dir, files[i])
+            table.insert(audio_files, file)
+        end
     end
 
     mp.set_property_native("sub-files", sub_files)
+    mp.set_property_native("audio-files", audio_files)
 end
 
 mp.register_event("start-file", autoload_sub_in_mka)
