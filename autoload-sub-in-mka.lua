@@ -100,7 +100,6 @@ function autoload_sub_in_mka()
     local audio_auto = mp.get_property("options/audio-file-auto", "")
 
     -- in current dir
-    -- Lua needs to escape ( ) . % + - * ? [ ] ^ $
     table.filter(files, function (v, k)
         if string.match(v, "^%.") then
             return false
