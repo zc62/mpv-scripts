@@ -88,8 +88,9 @@ function autoload_sub_in_mka()
     local audio_file_paths = mp.get_property_native("options/audio-file-paths", {})
     local sub_file_paths = mp.get_property_native("options/sub-file-paths", {})
 
-    -- for unknown reasons, these mka files won't be loaded as audio files
-    -- add them back manually
+    -- For unknown reasons, these mka files sometimes cannot be automatically
+    -- loaded as audio files. Add them back manually. But this causes the issue
+    -- that sometimes external mka files are loaded as audio files twice.
     local audio_auto = mp.get_property("options/audio-file-auto", "")
 
     -- in current dir
@@ -114,18 +115,20 @@ function autoload_sub_in_mka()
         mp.msg.info("Adding as subtitle files: " .. file)
     end
 
-    table.filter(files, function (v, k)
-        if audio_auto ~= "all" and get_filename(v, audio_auto) ~= filename_wo_ext then
-            return false
-        else
-            return true
-        end
-    end)
-    table.sort(files, alnumcomp)
+    if audio_auto ~= "no" then
+        table.filter(files, function (v, k)
+            if audio_auto ~= "all" and get_filename(v, audio_auto) ~= filename_wo_ext then
+                return false
+            else
+                return true
+            end
+        end)
+        table.sort(files, alnumcomp)
 
-    for i = 1, #files do
-        local file = mputils.join_path(dir, files[i])
-        mp.commandv("audio-add", file, "cached")
+        for i = 1, #files do
+            local file = mputils.join_path(dir, files[i])
+            mp.commandv("audio-add", file, "auto")
+        end
     end
 
     -- in sub-file-paths
@@ -188,18 +191,20 @@ function autoload_sub_in_mka()
             mp.msg.info("Adding as subtitle files: " .. file)
         end
 
-        table.filter(files, function (v, k)
-            if audio_auto ~= "all" and get_filename(v, audio_auto) ~= filename_wo_ext then
-                return false
-            else
-                return true
-            end
-        end)
-        table.sort(files, alnumcomp)
+        if audio_auto ~= "no" then
+            table.filter(files, function (v, k)
+                if audio_auto ~= "all" and get_filename(v, audio_auto) ~= filename_wo_ext then
+                    return false
+                else
+                    return true
+                end
+            end)
+            table.sort(files, alnumcomp)
 
-        for i = 1, #files do
-            local file = mputils.join_path(dir, files[i])
-            mp.commandv("audio-add", file, "cached")
+            for i = 1, #files do
+                local file = mputils.join_path(dir, files[i])
+                mp.commandv("audio-add", file, "auto")
+            end
         end
     end
 end
