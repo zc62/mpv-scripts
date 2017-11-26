@@ -1,5 +1,8 @@
 -- Load mka files as sub files.
--- Respect sub-auto, sub-file-paths and audio-file-paths options.
+-- Respect sub-auto, audio-auto, sub-file-paths and audio-file-paths options.
+-- This script may cause inconsistent track selection between different runs,
+-- because it depends on when the mpv-player main program loads mkv/mka files.
+-- Better to make this a built-in feature.
 
 mputils = require 'mp.utils'
 
@@ -92,9 +95,8 @@ function autoload_sub_in_mka()
     local audio_file_paths = mp.get_property_native("options/audio-file-paths", {})
     local sub_file_paths = mp.get_property_native("options/sub-file-paths", {})
 
-    -- For unknown reasons, these mka files sometimes cannot be automatically
-    -- loaded as audio files. Add them back manually. But this causes the issue
-    -- that sometimes external mka files are loaded as audio files twice.
+    -- For some reasons, these mka files sometimes cannot be automatically
+    -- loaded as audio files. Add them back manually if they are not loaded.
     local audio_auto = mp.get_property("options/audio-file-auto", "")
 
     -- in current dir
@@ -130,9 +132,22 @@ function autoload_sub_in_mka()
         end)
         table.sort(files, alnumcomp)
 
+        local flag = true
         for i = 1, #files do
             local file = mputils.join_path(dir, files[i])
-            mp.commandv("audio-add", file, "auto")
+            local track_count = mp.get_property("track-list/count", 1)
+            for j = 0, track_count-1 do
+                local track_type = mp.get_property("track-list/" .. j .. "/type")
+                local track_filename = mp.get_property("track-list/" .. j .. "/external-filename")
+                if track_type == "audio" and track_filename ~= nil then
+                    if track_filename == file then
+                        flag = false
+                    end
+                end
+            end
+            if flag then
+                mp.commandv("audio-add", file, "auto")
+            end
         end
     end
 
@@ -206,9 +221,22 @@ function autoload_sub_in_mka()
             end)
             table.sort(files, alnumcomp)
 
+            local flag = true
             for i = 1, #files do
                 local file = mputils.join_path(dir, files[i])
-                mp.commandv("audio-add", file, "auto")
+                local track_count = mp.get_property("track-list/count", 1)
+                for j = 0, track_count-1 do
+                    local track_type = mp.get_property("track-list/" .. j .. "/type")
+                    local track_filename = mp.get_property("track-list/" .. j .. "/external-filename")
+                    if track_type == "audio" and track_filename ~= nil then
+                        if track_filename == file then
+                            flag = false
+                        end
+                    end
+                end
+                if flag then
+                    mp.commandv("audio-add", file, "auto")
+                end
             end
         end
     end
