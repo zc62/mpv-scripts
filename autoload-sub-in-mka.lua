@@ -93,9 +93,6 @@ function autoload_sub_in_mka()
         return
     end
 
-    local audio_file_paths = mp.get_property_native("options/audio-file-paths", {})
-    local sub_file_paths = mp.get_property_native("options/sub-file-paths", {})
-
     -- For some reasons, these mka files sometimes cannot be automatically
     -- loaded as audio files. Add them back manually if they are not loaded.
     local audio_auto = mp.get_property("options/audio-file-auto", "")
@@ -122,7 +119,7 @@ function autoload_sub_in_mka()
         mp.msg.info("Adding as subtitle files: " .. file)
     end
 
-    if audio_auto ~= "no" then
+    if audio_auto ~= "no" and files ~= nil then
         table.filter(files, function (v, k)
             if audio_auto ~= "all" and not match_filename(v, audio_auto, filename_wo_ext) then
                 return false
@@ -132,8 +129,8 @@ function autoload_sub_in_mka()
         end)
         table.sort(files, alnumcomp)
 
-        local flag = true
         for i = 1, #files do
+            local flag = true
             local file = mputils.join_path(dir, files[i])
             local track_count = mp.get_property("track-list/count", 1)
             for j = 0, track_count-1 do
@@ -151,91 +148,93 @@ function autoload_sub_in_mka()
         end
     end
 
+    local sub_file_paths = mp.get_property_native("options/sub-file-paths", {})
+
     -- in sub-file-paths
     for i = 1, #sub_file_paths do
         local sub_file_path = mputils.join_path(dir, sub_file_paths[i])
         local files = mputils.readdir(sub_file_path, "files")
-        if files == nil then
-            break
-        end
-        table.filter(files, function (v, k)
-            if string.match(v, "^%.") then
-                return false
-            end
-            if sub_auto ~= "all" and not match_filename(v, sub_auto, filename_wo_ext) then
-                return false
-            end
-            local ext = get_extension(v)
-            if string.lower(ext) ~= "mka" then
-                return false
-            end
-            return true
-        end)
-        table.sort(files, alnumcomp)
+        if files ~= nil then
+            table.filter(files, function (v, k)
+                if string.match(v, "^%.") then
+                    return false
+                end
+                if sub_auto ~= "all" and not match_filename(v, sub_auto, filename_wo_ext) then
+                    return false
+                end
+                local ext = get_extension(v)
+                if string.lower(ext) ~= "mka" then
+                    return false
+                end
+                return true
+            end)
+            table.sort(files, alnumcomp)
 
-        for j = 1, #files do
-            local file = mputils.join_path(sub_file_path, files[j])
-            mp.commandv("sub-add", file, "auto")
-            mp.msg.info("Adding as subtitle files: " .. file)
+            for j = 1, #files do
+                local file = mputils.join_path(sub_file_path, files[j])
+                mp.commandv("sub-add", file, "auto")
+                mp.msg.info("Adding as subtitle files: " .. file)
+            end
         end
     end
+
+    local audio_file_paths = mp.get_property_native("options/audio-file-paths", {})
 
     -- in audio-file-paths, this script respects sub-auto=all as sub-auto=fuzzy
     for i = 1, #audio_file_paths do
         local audio_file_path = mputils.join_path(dir, audio_file_paths[i])
         local files = mputils.readdir(audio_file_path, "files")
-        if files == nil then
-            break
-        end
-        table.filter(files, function (v, k)
-            if string.match(v, "^%.") then
-                return false
-            end
-            -- no sub_auto ~= "all" here because even if sub-auto=all,
-            -- one should not expect all mka files in audio-file-paths to be
-            -- loaded as subtitle files
-            if not match_filename(v, sub_auto, filename_wo_ext) then
-                return false
-            end
-            local ext = get_extension(v)
-            if string.lower(ext) ~= "mka" then
-                return false
-            end
-            return true
-        end)
-        table.sort(files, alnumcomp)
-
-        for j = 1, #files do
-            local file = mputils.join_path(audio_file_path, files[j])
-            mp.commandv("sub-add", file, "auto")
-            mp.msg.info("Adding as subtitle files: " .. file)
-        end
-
-        if audio_auto ~= "no" then
+        if files ~= nil then
             table.filter(files, function (v, k)
-                if audio_auto ~= "all" and not match_filename(v, audio_auto, filename_wo_ext) then
+                if string.match(v, "^%.") then
                     return false
-                else
-                    return true
                 end
+                -- no sub_auto ~= "all" here because even if sub-auto=all,
+                -- one should not expect all mka files in audio-file-paths to be
+                -- loaded as subtitle files
+                if not match_filename(v, sub_auto, filename_wo_ext) then
+                    return false
+                end
+                local ext = get_extension(v)
+                if string.lower(ext) ~= "mka" then
+                    return false
+                end
+                return true
             end)
             table.sort(files, alnumcomp)
 
-            local flag = true
-            for i = 1, #files do
-                local file = mputils.join_path(dir, files[i])
-                local track_count = mp.get_property("track-list/count", 1)
-                for j = 0, track_count-1 do
-                    local track_type = mp.get_property("track-list/" .. j .. "/type")
-                    local track_filename = mp.get_property("track-list/" .. j .. "/external-filename")
-                    if track_type == "audio" and track_filename ~= nil then
-                        if track_filename == file then
-                            flag = false
+            for j = 1, #files do
+                local file = mputils.join_path(audio_file_path, files[j])
+                mp.commandv("sub-add", file, "auto")
+                mp.msg.info("Adding as subtitle files: " .. file)
+            end
+
+            if audio_auto ~= "no" and files ~= nil then
+                table.filter(files, function (v, k)
+                    if audio_auto ~= "all" and not match_filename(v, audio_auto, filename_wo_ext) then
+                        return false
+                    else
+                        return true
+                    end
+                end)
+                table.sort(files, alnumcomp)
+
+                for i = 1, #files do
+                    local flag = true
+                    local file = mputils.join_path(dir, files[i])
+                    local track_count = mp.get_property("track-list/count", 1)
+                    for j = 0, track_count-1 do
+                        local track_type = mp.get_property("track-list/" .. j .. "/type")
+                        local track_filename = mp.get_property("track-list/" .. j .. "/external-filename")
+                        if track_type == "audio" and track_filename ~= nil then
+                            if track_filename == file then
+                                flag = false
+                            end
                         end
                     end
-                end
-                if flag then
-                    mp.commandv("audio-add", file, "auto")
+                    if flag then
+                        mp.commandv("audio-add", file, "auto")
+                    end
                 end
             end
         end
