@@ -90,10 +90,6 @@ function autoload_sub_in_mka()
         return
     end
 
-    -- For some reasons, these mka files sometimes cannot be automatically
-    -- loaded as audio files. Add them back manually if they are not loaded.
-    local audio_auto = mp.get_property("options/audio-file-auto", "")
-
     -- in current dir
     table.filter(files, function (v, k)
         if string.match(v, "^%.") then
