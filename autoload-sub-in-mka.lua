@@ -1,3 +1,13 @@
+--[[
+  _   _             _                                               _   _                     _              _   _ 
+ | \ | |   ___     | |       ___    _ __     __ _    ___   _ __    | \ | |   ___    ___    __| |   ___    __| | | |
+ |  \| |  / _ \    | |      / _ \  | '_ \   / _` |  / _ \ | '__|   |  \| |  / _ \  / _ \  / _` |  / _ \  / _` | | |
+ | |\  | | (_) |   | |___  | (_) | | | | | | (_| | |  __/ | |      | |\  | |  __/ |  __/ | (_| | |  __/ | (_| | |_|
+ |_| \_|  \___/    |_____|  \___/  |_| |_|  \__, |  \___| |_|      |_| \_|  \___|  \___|  \__,_|  \___|  \__,_| (_)
+                                            |___/                                                                  
+No longer needed after: https://github.com/mpv-player/mpv/commit/80d43ee4e692f13358f134c906ba2c5439ecde5f
+]]
+--[[
 -- Load mka files as sub files.
 -- Respect sub-auto, audio-auto, sub-file-paths and audio-file-paths options.
 -- Issue 5132
@@ -177,3 +187,4 @@ function autoload_sub_in_mka()
 end
 
 mp.register_event("file-loaded", autoload_sub_in_mka)
+]]
