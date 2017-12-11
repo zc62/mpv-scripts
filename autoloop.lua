@@ -19,8 +19,12 @@ local was_loop = mp.get_property_native("loop-file")
 
 function set_loop()
     local duration = mp.get_property_native("duration")
-    if duration  < autoloop_duration + 0.001 then
-        mp.set_property_native("loop-file", "inf")
+    if duration ~= nil then
+        if duration  < autoloop_duration + 0.001 then
+            mp.set_property_native("loop-file", "inf")
+        else
+            mp.set_property_native("loop-file", was_loop)
+        end
     else
         mp.set_property_native("loop-file", was_loop)
     end
