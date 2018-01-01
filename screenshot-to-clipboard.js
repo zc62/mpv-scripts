@@ -1,5 +1,5 @@
 // Issue mpv-player/mpv#5330
-// copy screenshot to clipboard, instead of saving to file (Windows only)
+// Generate a temp screenshot file on desktop then copy to clipboard. (Windows only)
 // nircmd is required: http://www.nirsoft.net/utils/nircmd.html
 //
 // script option: ss-2-cb-nircmdc="nircmdc"
