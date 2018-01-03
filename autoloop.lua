@@ -22,6 +22,7 @@ function set_loop()
     if duration ~= nil then
         if duration  < autoloop_duration + 0.001 then
             mp.set_property_native("loop-file", "inf")
+            mp.osd_message("autoloop.lua: set loop=inf")
         else
             mp.set_property_native("loop-file", was_loop)
         end
