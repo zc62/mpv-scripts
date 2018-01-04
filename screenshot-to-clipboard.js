@@ -42,5 +42,5 @@ function ss_2_cb_window()
 }
 
 mp.add_key_binding("s", "screenshot-to-clipboard", ss_2_cb);
-mp.add_key_binding("S", "screenshot-to-clipboard_video", ss_2_cb_video)
-mp.add_key_binding("ctrl+s", "screenshot-to-clipboard_window", ss_2_cb_window)
+mp.add_key_binding("S", "screenshot-to-clipboard_video", ss_2_cb_video);
+mp.add_key_binding("ctrl+s", "screenshot-to-clipboard_window", ss_2_cb_window);
