@@ -21,13 +21,12 @@ function set_loop()
     local duration = mp.get_property_native("duration")
     if duration ~= nil then
         if duration  < autoloop_duration + 0.001 then
-            mp.set_property_native("loop-file", "inf")
-            mp.osd_message("Autoloop: loop-file=inf")
+            mp.command("set loop-file inf")
         else
-            mp.set_property_native("loop-file", was_loop)
+            mp.commandv("set", "loop-file", was_loop)
         end
     else
-        mp.set_property_native("loop-file", was_loop)
+        mp.commandv("set", "loop-file", was_loop)
     end
 end
 
