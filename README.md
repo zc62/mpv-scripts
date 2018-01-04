@@ -8,11 +8,11 @@ Now not needed anymore. Solved by commit [mpv-player/mpv@80d43ee](https://github
 
 ## autoloop.lua
 Work on issue [mpv-player/mpv#5222](https://github.com/mpv-player/mpv/issues/5222).
-Automatically loop files that are under a given duration (default 5 seconds).
+Automatically loops files that are under a given duration (default 5 seconds).
 
 ## screenshot-to-clipboard.js
 Work on issue [mpv-player/mpv#5330](https://github.com/mpv-player/mpv/issues/5330).
-Generate a temp screenshot file on desktop then copy to clipboard. (Windows only)
+Generates a temp screenshot file on desktop then copy to clipboard. (Windows only)
 
 ## save-sub-delay.lua
 This script saves the sub-delay quantity for each file. When next time the file is opened, sub-delay is automatically restored.
