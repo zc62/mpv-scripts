@@ -24,8 +24,7 @@ function read_sub_delay()
         if sub_delay_table[path] ~= nil then
             sub_delay = sub_delay_table[path]
             if sub_delay > 0.000999 or sub_delay < -0.000999 then
-                mp.commandv("add", "sub-delay", sub_delay)
-                mp.osd_message(("Sub delay: %d ms"):format(sub_delay*1000))
+                mp.command("add sub-delay " .. sub_delay)
             end
         end
     else
@@ -46,16 +45,14 @@ function write_sub_delay()
 end
 
 function sub_delay_pos()
-    mp.commandv("add", "sub-delay", 0.1)
+    mp.command("add sub-delay 0.1")
     local sub_delay = mp.get_property_native("sub-delay")
-    mp.osd_message(("Sub delay: %d ms"):format(sub_delay*1000))
     write_sub_delay()
 end
 
 function sub_delay_neg()
-    mp.commandv("add", "sub-delay", -0.1)
+    mp.command("add sub-delay -0.1")
     local sub_delay = mp.get_property_native("sub-delay")
-    mp.osd_message(("Sub delay: %d ms"):format(sub_delay*1000))
     write_sub_delay()
 end
 
