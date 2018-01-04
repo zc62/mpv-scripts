@@ -46,13 +46,11 @@ end
 
 function sub_delay_pos()
     mp.command("add sub-delay 0.1")
-    local sub_delay = mp.get_property_native("sub-delay")
     write_sub_delay()
 end
 
 function sub_delay_neg()
     mp.command("add sub-delay -0.1")
-    local sub_delay = mp.get_property_native("sub-delay")
     write_sub_delay()
 end
 
