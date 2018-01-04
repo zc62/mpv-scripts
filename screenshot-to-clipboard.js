@@ -23,19 +23,22 @@ var ss_file = mp.utils.get_user_path("~~desktop/mpv-ss-2-cb.png");
 function ss_2_cb()
 {
     mp.commandv("osd-msg", "screenshot-to-file", ss_file);
-    mp.utils.subprocess({"args" : [nircmdc, "clipboard", "copyimage", ss_file]});
+    mp.utils.subprocess_detached({"args" : [nircmdc, "clipboard", "copyimage",
+        ss_file]});
 }
 
 function ss_2_cb_video()
 {
     mp.commandv("osd-msg", "screenshot-to-file", ss_file, "video");
-    mp.utils.subprocess({"args" : [nircmdc, "clipboard", "copyimage", ss_file]});
+    mp.utils.subprocess_detached({"args" : [nircmdc, "clipboard", "copyimage",
+        ss_file]});
 }
 
 function ss_2_cb_window()
 {
     mp.commandv("osd-msg", "screenshot-to-file", ss_file, "window");
-    mp.utils.subprocess({"args" : [nircmdc, "clipboard", "copyimage", ss_file]});
+    mp.utils.subprocess_detached({"args" : [nircmdc, "clipboard", "copyimage",
+        ss_file]});
 }
 
 mp.add_key_binding("s", "screenshot-to-clipboard", ss_2_cb);
