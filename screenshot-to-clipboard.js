@@ -20,7 +20,6 @@ getOption();
 
 var ss_file = mp.utils.get_user_path("~~desktop/mpv-ss-2-cb.png");
 
-
 function ss_2_cb()
 {
     mp.commandv("osd-msg", "screenshot-to-file", ss_file);
