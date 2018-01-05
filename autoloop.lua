@@ -23,10 +23,10 @@ function set_loop()
         if duration  < autoloop_duration + 0.001 then
             mp.command("set loop-file inf")
         else
-            mp.commandv("set", "loop-file", was_loop)
+            mp.set_property_native("loop-file", was_loop)
         end
     else
-        mp.commandv("set", "loop-file", was_loop)
+        mp.set_property_native("loop-file", was_loop)
     end
 end
 
