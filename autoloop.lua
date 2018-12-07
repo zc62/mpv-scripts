@@ -21,7 +21,7 @@ local changed = false
 
 function set_loop()
     local duration = mp.get_property_native("duration")
-    -- Check the property again in case auto profiles (e.g., extensions.gjf)
+    -- Check the property again in case auto profiles (e.g., extensions.gif)
     -- have changed it since the script is loaded
     was_loop = mp.get_property_native("loop-file")
     if duration ~= nil and was_loop ~= true then
@@ -36,7 +36,10 @@ function reset_loop()
     -- I need this hack because the "end-file" event is often accompanied by
     -- the loading process of the next file in the playlist. If the
     -- "loop-file" property is already changed by auto profiles (e.g.,
-    -- extensions.gjf), then do not try to reset this property
+    -- extensions.gif), then do not try to reset this property.
+    -- Works only when the auto profile is setting "loop-file" to values other
+    -- than "yes", otherwise this may not properly set the next file to inf
+    -- loop even the auto profile requires so. See #1
     local status = mp.get_property_native("loop-file")
     if changed and status == true then
         mp.set_property_native("loop-file", was_loop)
