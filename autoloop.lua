@@ -26,7 +26,7 @@ function set_loop()
     was_loop = mp.get_property_native("loop-file")
     if duration ~= nil and was_loop ~= true then
         if duration < autoloop_duration + 0.001 then
-            mp.command("set loop-file inf")
+            mp.command("set loop-file 10000")
             changed = true
         end
     end
@@ -37,13 +37,18 @@ function reset_loop()
     -- the loading process of the next file in the playlist. If the
     -- "loop-file" property is already changed by auto profiles (e.g.,
     -- extensions.gif), then do not try to reset this property.
-    -- Works only when the auto profile is setting "loop-file" to values other
-    -- than "yes", otherwise this may not properly set the next file to inf
-    -- loop even the auto profile requires so. See #1
+    -- Works only when the auto profile is setting "loop-file" to values no
+    -- greater than 5000 (ideally it should be set to "yes" or "no"),
+    -- otherwise this may not properly set the next file to N loops even the
+    -- auto profile requires so.
+    -- See https://github.com/zc62/mpv-scripts/issues/1
     local status = mp.get_property_native("loop-file")
-    if changed and status == true then
-        mp.set_property_native("loop-file", was_loop)
-        changed = false
+    local test = tonumber(status)
+    if test ~= nil then
+        if changed and test > 5000 then
+            mp.set_property_native("loop-file", was_loop)
+            changed = false
+        end
     end
 end
 
