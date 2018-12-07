@@ -38,7 +38,7 @@ function reset_loop()
     -- "loop-file" property is already changed by auto profiles (e.g.,
     -- extensions.gjf), then do not try to reset this property
     local status = mp.get_property_native("loop-file")
-    if changed and status == was_loop then
+    if changed and status == true then
         mp.set_property_native("loop-file", was_loop)
         changed = false
     end
