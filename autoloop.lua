@@ -15,19 +15,34 @@ function getOption()
 end
 getOption()
 
+-- This is the property after the script is loaded. Global config
 local was_loop = mp.get_property_native("loop-file")
+local changed = false
 
 function set_loop()
     local duration = mp.get_property_native("duration")
-    if duration ~= nil then
-        if duration  < autoloop_duration + 0.001 then
+    -- Check the property again in case auto profiles (e.g., extensions.gjf)
+    -- have changed it since the script is loaded
+    was_loop = mp.get_property_native("loop-file")
+    if duration ~= nil and was_loop ~= true then
+        if duration < autoloop_duration + 0.001 then
             mp.command("set loop-file inf")
-        else
-            mp.set_property_native("loop-file", was_loop)
+            changed = true
         end
-    else
+    end
+end
+
+function reset_loop()
+    -- I need this hack because the "end-file" event is often accompanied by
+    -- the loading process of the next file in the playlist. If the
+    -- "loop-file" property is already changed by auto profiles (e.g.,
+    -- extensions.gjf), then do not try to reset this property
+    local status = mp.get_property_native("loop-file")
+    if changed and status == was_loop then
         mp.set_property_native("loop-file", was_loop)
+        changed = false
     end
 end
 
 mp.register_event("file-loaded", set_loop)
+mp.register_event("end-file", reset_loop)
