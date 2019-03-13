@@ -16,3 +16,6 @@ Generates a temp screenshot file on desktop then copy to clipboard. (Windows onl
 
 ## save-sub-delay.lua
 This script saves the sub-delay quantity for each file. When next time the file is opened, sub-delay is automatically restored.
+
+## exit-fullscreen.lua
+If you use `--keep-open=yes`, this script exits fullscreen mode when the playback reaches the end of file/playlist.
