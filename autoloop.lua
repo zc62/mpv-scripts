@@ -1,56 +1,53 @@
 -- mpv issue 5222
--- Automatically set loop-file=inf for duration < given length. Default is 5s
--- Use script-opts=autoloop-duration=x in mpv.conf to set your preferred length
+-- Automatically set loop-file=inf for duration <= given length. Default is 5s
+-- Use autoloop_duration=n in script-opts/autoloop.conf to set your preferred length
+-- Alternatively use script-opts=autoloop-autoloop_duration=n in mpv.conf (takes priority)
 
-local autoloop_duration = 5
+
+require 'mp.options'
 
 function getOption()
-    local opt = mp.get_opt("autoloop-duration")
-    if (opt ~= nil) then
-        local test = tonumber(opt)
-        if (test ~= nil) then
-            autoloop_duration = test
-        end
-    end
-end
-getOption()
+    -- Use recommended way to get options
+    local options = {autoloop_duration = 5}
+    read_options(options)
+    autoloop_duration = options.autoloop_duration
 
--- This is the property after the script is loaded. Global config
-local was_loop = mp.get_property_native("loop-file")
-local changed = false
+
+    -- Keep old way just for compatibility (remove lines 15-27 soon)
+    if autoloop_duration ~= 5 then
+        return
+    end
+
+    local opt = tonumber(mp.get_opt("autoloop-duration"))
+    if not opt then
+        return
+    end
+    print("Depracted configuration!  Please use script-opts directory to set auto_loop duration")
+    print("Or use 'script-opts=autoloop-autoloop_duration' in mpv.conf")
+    autoloop_duration = opt
+    -- Remove lines 15-27 soon
+end
 
 function set_loop()
     local duration = mp.get_property_native("duration")
-    -- Check the property again in case auto profiles (e.g., extensions.gif)
-    -- have changed it since the script is loaded
+
+    -- Checks whether the loop status was changed for the last file
     was_loop = mp.get_property_native("loop-file")
-    if duration ~= nil and was_loop ~= true then
-        if duration < autoloop_duration + 0.001 then
-            mp.command("set loop-file 10000")
-            changed = true
-        end
+
+    -- Cancel operation if there is no file duration
+    if not duration then
+        return
+    end
+
+    -- Loops file if was_loop is false, and file meets requirements
+    if not was_loop and duration <= autoloop_duration then
+        mp.set_property_native("loop-file", true)
+        -- Unloops file if was_loop is true, and file does not meet requirements
+    elseif was_loop and duration > autoloop_duration then
+        mp.set_property_native("loop-file", false)
     end
 end
 
-function reset_loop()
-    -- I need this hack because the "end-file" event is often accompanied by
-    -- the loading process of the next file in the playlist. If the
-    -- "loop-file" property is already changed by auto profiles (e.g.,
-    -- extensions.gif), then do not try to reset this property.
-    -- Works only when the auto profile is setting "loop-file" to values no
-    -- greater than 5000 (ideally it should be set to "yes" or "no"),
-    -- otherwise this may not properly set the next file to N loops even the
-    -- auto profile requires so.
-    -- See https://github.com/zc62/mpv-scripts/issues/1
-    local status = mp.get_property_native("loop-file")
-    local test = tonumber(status)
-    if test ~= nil then
-        if changed and test > 5000 then
-            mp.set_property_native("loop-file", was_loop)
-            changed = false
-        end
-    end
-end
 
+getOption()
 mp.register_event("file-loaded", set_loop)
-mp.register_event("end-file", reset_loop)
